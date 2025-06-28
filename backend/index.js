@@ -9,6 +9,21 @@ dotenv.config()
 
 const app = express()
 
+fetch(API_URL + '/presenca', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(dados)
+})
+.then(res => {
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.text();
+})
+.then(text => alert('Enviado: '+text))
+.catch(err => {
+  console.error('Erro ao enviar presença:', err);
+  alert('Erro ao enviar presença: '+err.message);
+});
+
 const PORT    = process.env.PORT || 3000;
 const FRONT   = process.env.FRONT_URL;  // ex: https://presencas-bras.vercel.app
 const GAS_URL = process.env.GAS_URL;
