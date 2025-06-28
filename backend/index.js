@@ -1,6 +1,14 @@
-import dotenv from 'dotenv';
-dotenv.config();  // carrega o .env
-const app = express();
+// backend/index.js
+import express from 'express'
+import cors    from 'cors'
+import dotenv  from 'dotenv'
+import morgan  from 'morgan'
+import fetch   from 'node-fetch'
+
+dotenv.config()
+
+const app = express()
+
 const PORT    = process.env.PORT || 3000;
 const FRONT   = process.env.FRONT_URL;  // ex: https://presencas-bras.vercel.app
 const GAS_URL = process.env.GAS_URL;
