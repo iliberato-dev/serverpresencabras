@@ -2,10 +2,10 @@
   "name": "presencas-backend",
   "version": "1.0.0",
   "description": "Backend para controle de presenças",
-  "main": "index.js", // <--- MUDAR AQUI: de "server.js" para "index.js"
+  "main": "index.js",
   "type": "module", 
   "scripts": {
-    "start": "node index.js" // <--- MUDAR AQUI: de "node server.js" para "node index.js"
+    "start": "node index.js" //
   },
   "dependencies": {
     "express": "^4.19.2",
