@@ -1,35 +1,43 @@
-import express from 'express'
-import cors from 'cors'
-import morgan from 'morgan'
-import fetch from 'node-fetch'
-import dotenv from 'dotenv'
+dotenv.config();
+const app = express();
+const PORT    = process.env.PORT || 3000;
+const FRONT   = process.env.FRONT_URL;  // ex: https://presencas-bras.vercel.app
+const GAS_URL = process.env.GAS_URL;
 
-dotenv.config()
-const app = express()
-const PORT = process.env.PORT || 3000
-const GAS_URL = process.env.GAS_URL
+// 1) CORS: permita apenas seu front e trate preflight
+const corsOptions = {
+  origin: FRONT,
+  methods: ['GET','POST','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+};
+app.use(cors(corsOptions));
+// Garante resposta a OPTIONS em todas as rotas
+app.options('*', cors(corsOptions));
 
-// Middlewares
-app.use(cors({ origin: ['https://presencas-bras.vercel.app/'] })) // ajuste seu front-end host
-app.use(express.json())
-app.use(morgan('tiny'))
+// 2) json parser e log
+app.use(express.json());
+app.use(morgan('tiny'));
 
-// POST /presenca -> reencaminha ao Apps Script
+// 3) suas rotas
+app.get('/', (req, res) => res.send('API no ar!'));
+
 app.post('/presenca', async (req, res) => {
   try {
     const resp = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify(req.body)
-    })
-    const text = await resp.text()
-    return res.status(200).send(text)
-  } catch (err) {
-    console.error('Erro /presenca:', err)
-    return res.status(500).json({ error: err.message })
+    });
+    const text = await resp.text();
+    return res.status(200).send(text);
+  } catch(err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
   }
-})
+});
+
+// outros GETs que você tenha...
 
 app.listen(PORT, () =>
-  console.log(`API rodando em https://presencas-bras.vercel.app/:${PORT}`)
-)
+  console.log(`API ouvindo em http://localhost:${PORT}`)
+);
