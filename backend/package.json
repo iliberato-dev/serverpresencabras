@@ -1,24 +1,15 @@
 {
-  "name": "appbras",
+  "name": "presencas-backend",
   "version": "1.0.0",
-  "main": "script.js",
+  "description": "Backend para controle de presenças",
+  "main": "index.js", // <--- MUDAR AQUI: de "server.js" para "index.js"
+  "type": "module", 
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js" // <--- MUDAR AQUI: de "node server.js" para "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
+    "express": "^4.19.2",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "node-fetch": "^3.3.2"
-  },
-  "type": "module",
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11"
+    "node-fetch": "^2.6.7" 
   }
 }
