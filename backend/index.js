@@ -1,67 +1,48 @@
 // backend/index.js
-import express from 'express'
-import cors    from 'cors'
-import dotenv  from 'dotenv'
-import morgan  from 'morgan'
-import fetch   from 'node-fetch'
+import express from 'express';
+import cors    from 'cors';
+import dotenv  from 'dotenv';
+import fetch   from 'node-fetch';
 
-dotenv.config()
-
-const app = express()
-
-fetch(API_URL + '/presenca', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(dados)
-})
-.then(res => {
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.text();
-})
-.then(text => alert('Enviado: '+text))
-.catch(err => {
-  console.error('Erro ao enviar presença:', err);
-  alert('Erro ao enviar presença: '+err.message);
-});
-
-const PORT    = process.env.PORT || 3000;
-const FRONT   = process.env.FRONT_URL;  // ex: https://presencas-bras.vercel.app
+dotenv.config();
+const app     = express();
+const PORT    = process.env.PORT;
+const FRONT   = process.env.FRONT_URL;
 const GAS_URL = process.env.GAS_URL;
 
-// 1) CORS: permita apenas seu front e trate preflight
-const corsOptions = {
-  origin: FRONT,
-  methods: ['GET','POST','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
-};
-app.use(cors(corsOptions));
-// Garante resposta a OPTIONS em todas as rotas
-app.options('*', cors(corsOptions));
+// habilita CORS só pro seu front
+app.use(cors({ origin: FRONT }));
+app.options('*', cors({ origin: FRONT }));
 
-// 2) json parser e log
 app.use(express.json());
-app.use(morgan('tiny'));
 
-// 3) suas rotas
-app.get('/', (req, res) => res.send('API no ar!'));
+// rota proxy para GETs (getMembros e presencasMes)
+app.get('/presenca', async (req, res) => {
+  try {
+    const { tipo } = req.query;
+    const resp = await fetch(`${GAS_URL}?tipo=${tipo}`, { method: 'GET' });
+    const data = await resp.json();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
+// rota proxy para POST (gravar presença)
 app.post('/presenca', async (req, res) => {
   try {
     const resp = await fetch(GAS_URL, {
       method: 'POST',
-      headers:{ 'Content-Type':'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
     const text = await resp.text();
-    return res.status(200).send(text);
-  } catch(err) {
+    res.send(text);
+  } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// outros GETs que você tenha...
-
-app.listen(PORT, () =>
-  console.log(`API ouvindo em http://localhost:${PORT}`)
-);
+app.listen(PORT, () => console.log(`API ouvindo na porta ${PORT}`));
