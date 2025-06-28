@@ -18,6 +18,8 @@ app.use(express.json());
 
 // rota proxy para GETs (getMembros e presencasMes)
 app.get('/presenca', async (req, res) => {
+  console.log('📢 Express recebeu GET /presenca com query:', req.query);
+
   try {
     const { tipo } = req.query;
     const resp = await fetch(`${GAS_URL}?tipo=${tipo}`, { method: 'GET' });
