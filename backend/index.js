@@ -1,4 +1,5 @@
-dotenv.config();
+import dotenv from 'dotenv';
+dotenv.config();  // carrega o .env
 const app = express();
 const PORT    = process.env.PORT || 3000;
 const FRONT   = process.env.FRONT_URL;  // ex: https://presencas-bras.vercel.app
