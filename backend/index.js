@@ -117,9 +117,9 @@ app.use(express.static(__dirname));
 
 // Para lidar com rotas não encontradas no frontend (SPA - Single Page Application)
 // Redireciona para index.html para que o frontend lide com roteamento
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
 
 
 // ------------------------------------------------------
@@ -129,4 +129,3 @@ app.listen(PORT, () => {
   console.log(`Backend intermediário rodando em http://localhost:${PORT}`);
   console.log(`Conectando-se ao Apps Script em: ${APPS_SCRIPT_URL}`);
 });
-
