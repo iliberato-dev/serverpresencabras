@@ -112,7 +112,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 
 // Para lidar com rotas não encontradas no frontend (SPA - Single Page Application)
@@ -129,3 +129,4 @@ app.listen(PORT, () => {
   console.log(`Backend intermediário rodando em http://localhost:${PORT}`);
   console.log(`Conectando-se ao Apps Script em: ${APPS_SCRIPT_URL}`);
 });
+
