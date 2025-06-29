@@ -10,7 +10,7 @@ app.use(express.json());
 
 // ===> URL BASE DO SEU GOOGLE APPS SCRIPT WEB APP <===
 // Certifique-se que esta URL é o URL do seu deployment do Apps Script (termina em /exec)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8B3U7UyOlwPR4ZmORdWinP4bUyc4U1xqxn_qb7x3I94Oz3G4ku9rQ3pmuuTLFHHxj/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8Y5Q18jwAqJ9JY-ruay9TrgQIDNoMBWQqK-OJ2kvAnrljZotJEbEmk-VMgyU8-9VT0A/exec";
 
 // Função utilitária para fazer requisições GET ao Apps Script
 // Esta função AGORA irá adicionar o parâmetro '?tipo='
