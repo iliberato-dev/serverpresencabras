@@ -14,7 +14,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyXxjdGWoeeKW6
 
 // Função utilitária para fazer requisições GET ao Apps Script
 // Esta função AGORA irá adicionar o parâmetro '?tipo='
-async function fetchFromAppsScript(endpointType) { // 'endpointType' é o nome da função no Apps Script (ex: 'getMembros')
+async function fetchFromAppsScript(endpointType) {
     const url = `${APPS_SCRIPT_URL}?tipo=${endpointType}`; // <--- MUDANÇA AQUI: usando '?tipo='
     console.log(`Backend: Encaminhando GET para Apps Script: ${url}`);
     const response = await fetch(url);
@@ -24,6 +24,7 @@ async function fetchFromAppsScript(endpointType) { // 'endpointType' é o nome d
     }
     return await response.json();
 }
+
 
 // ------------------------------------------------------
 // ROTAS GET PARA O FRONTEND (SEU SERVIDOR DO RENDER)
@@ -64,42 +65,95 @@ app.get("/get-presencas-total", async (req, res) => {
 // ROTA POST PARA REGISTRAR PRESENÇA
 // ------------------------------------------------------
 app.post("/presenca", async (req, res) => {
-  try {
-    console.log("Recebido do frontend (POST /presenca):", req.body);
+  try {
+    console.log("Recebido do frontend (POST /presenca):", req.body);
 
-    const response = await fetch(
-      APPS_SCRIPT_URL, // O Apps Script doPost não usa parâmetros de URL
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(req.body), // O corpo já contém o payload para doPost
-      }
-    );
+    const response = await fetch(
+      APPS_SCRIPT_URL, // O Apps Script doPost não usa parâmetros de URL
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req.body), // O corpo já contém o payload para doPost
+      }
+    );
 
-    const text = await response.text(); 
-    
-    let responseData;
-    try {
-        responseData = JSON.parse(text); 
-    } catch (parseError) {
-        responseData = { message: text }; 
-    }
+    const text = await response.text();
 
-    if (!response.ok || responseData.message?.startsWith('Erro:')) { 
-        console.error("Erro do Apps Script (POST):", response.status, responseData);
-        return res.status(response.status >= 400 ? response.status : 500).json({ 
-            error: "Erro do Apps Script ao registrar presença", 
-            details: responseData.message || responseData 
-        });
-    }
+    let responseData;
+    try {
+        responseData = JSON.parse(text);
+    } catch (parseError) {
+        responseData = { message: text };
+    }
 
-    console.log("Resposta do Apps Script (POST):", responseData);
-    res.status(200).json(responseData); 
-  } catch (err) {
-    console.error("Erro ao enviar para o Apps Script (POST):", err);
-    res.status(500).json({ error: "Erro interno do servidor", details: err.message });
-  }
+    if (!response.ok || responseData.message?.startsWith('Erro:')) {
+        console.error("Erro do Apps Script (POST /presenca):", response.status, responseData);
+        return res.status(response.status >= 400 ? response.status : 500).json({
+            error: "Erro do Apps Script ao registrar presença",
+            details: responseData.message || responseData
+        });
+    }
+
+    console.log("Resposta do Apps Script (POST /presenca):", responseData);
+    res.status(200).json(responseData);
+  } catch (err) {
+    console.error("Erro ao enviar para o Apps Script (POST /presenca):", err);
+    res.status(500).json({ error: "Erro interno do servidor", details: err.message });
+  }
 });
+
+// --- NOVAS ROTAS POST PARA AUTENTICAÇÃO ---
+// Estas rotas recebem a requisição do frontend e a encaminham para o Apps Script
+async function forwardAuthRequest(req, res, actionType) {
+    try {
+        console.log(`Recebido do frontend (POST /auth/${actionType}):`, req.body);
+
+        // Adiciona a propriedade 'action' ao payload recebido do frontend
+        const payloadWithAction = { ...req.body, action: actionType };
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payloadWithAction), // Envia o payload modificado para o Apps Script
+        });
+
+        const text = await response.text();
+
+        let responseData;
+        try {
+            responseData = JSON.parse(text);
+        } catch (parseError) {
+            responseData = { message: text };
+        }
+
+        if (!response.ok || responseData.message?.startsWith('Erro:')) {
+            console.error(`Erro do Apps Script (POST /auth/${actionType}):`, response.status, responseData);
+            return res.status(response.status >= 400 ? response.status : 500).json({
+                error: `Erro do Apps Script ao processar ${actionType}`,
+                details: responseData.message || responseData
+            });
+        }
+
+        console.log(`Resposta do Apps Script (POST /auth/${actionType}):`, responseData);
+        res.status(200).json(responseData);
+    } catch (err) {
+        console.error(`Erro ao enviar para o Apps Script (POST /auth/${actionType}):`, err);
+        res.status(500).json({ error: "Erro interno do servidor", details: err.message });
+    }
+}
+
+app.post("/auth/register", async (req, res) => {
+    await forwardAuthRequest(req, res, 'register');
+});
+
+app.post("/auth/login", async (req, res) => {
+    await forwardAuthRequest(req, res, 'login');
+});
+
+app.post("/auth/forgotPassword", async (req, res) => {
+    await forwardAuthRequest(req, res, 'forgotPassword');
+});
+
 
 // ------------------------------------------------------
 // Servir arquivos estáticos do frontend
@@ -118,7 +172,9 @@ app.use(express.static(__dirname));
 // Para lidar com rotas não encontradas no frontend (SPA - Single Page Application)
 // Redireciona para index.html para que o frontend lide com roteamento
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    // Se o index.html está na raiz do projeto (junto com server.js), use path.join(__dirname, 'index.html')
+    // Se o index.html está em uma subpasta 'public', use path.join(__dirname, 'public', 'index.html')
+    res.sendFile(path.join(__dirname, 'index.html')); 
 });
 
 
