@@ -9,7 +9,7 @@ app.use(cors()); // Permite requisições de qualquer origem, incluindo seu fron
 app.use(express.json());
 
 // ===> URL BASE DO SEU GOOGLE APPS SCRIPT WEB APP <===
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQG5KMwOugQVSqEm9M2G2dwRoKKygmwQTxoWZMg05Uf7QJlkDi6zfocjEFdxbiXkfy/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyXxjdGWoeeKW6HDYxD5F3pZEzHsg4PbFWMA89XgjITO55cpUvHbTU8TzIgNF62DfS/exec";
 
 // Função utilitária para fazer requisições GET ao Apps Script
 async function fetchFromAppsScript(type) {
