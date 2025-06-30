@@ -105,16 +105,16 @@ app.post("/presenca", async (req, res) => {
 });
 
 // Configuração para servir arquivos estáticos (frontend)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 // Assumindo que seus arquivos HTML, CSS, JS estão na pasta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Para lidar com rotas não encontradas no frontend (SPA - Single Page Application)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
 
 // INICIAR O SERVIDOR
 app.listen(PORT, () => {
