@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 // ===> URL BASE DO SEU GOOGLE APPS SCRIPT WEB APP <===
 // Obtenha este URL após o deploy do seu Apps Script (termina em /exec)
 // EXEMPLO: "https://script.google.com/macros/s/AKfycbwyXxjdGWoeeKW6HDYxD5F3pZEzHsg4PbFWMA89GjITO55cpUvHbTU8TzIgNF62DfS/exec";
-const APPS_SCRIPT_URL = "SEU_APPS_SCRIPT_URL_AQUI"; // <--- ATUALIZE AQUI COM O URL DO SEU DEPLOY DO APPS SCRIPT!
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMMKdrrCKbZZueEw0bMl23Gqd_-weRuSliosPcyPoKBSQk1cHLkQCEcQWN-HIppDTv/exec"; // <--- ATUALIZE AQUI COM O URL DO SEU DEPLOY DO APPS SCRIPT!
 
 // ===> URL DO SEU FRONTEND HOSPEDADO NO VERCEL <===
 // Você forneceu esta URL!
