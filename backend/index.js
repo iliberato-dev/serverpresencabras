@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import fetch from 'node-fetch'; // Para Node.js < 18, senão remova.
+import fetch from 'node-fetch'; // Se estiver usando Node.js 18+ (ou módulos esm em versões anteriores), 'fetch' é global.
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -10,14 +10,19 @@ const PORT = process.env.PORT || 3000;
 // ===> URL BASE DO SEU GOOGLE APPS SCRIPT WEB APP <===
 // Obtenha este URL após o deploy do seu Apps Script (termina em /exec)
 // EXEMPLO: "https://script.google.com/macros/s/AKfycbwyXxjdGWoeeKW6HDYxD5F3pZEzHsg4PbFWMA89GjITO55cpUvHbTU8TzIgNF62DfS/exec";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyXxjdGWoeeKW6HDYxD5F3pZEzHsg4PbFWMA89GjITO55cpUvHbTU8TzIgNF62DfS/exec"; // <--- ATUALIZE AQUI COM O URL DO SEU DEPLOY DO APPS SCRIPT!
+const APPS_SCRIPT_URL = "SEU_APPS_SCRIPT_URL_AQUI"; // <--- ATUALIZE AQUI COM O URL DO SEU DEPLOY DO APPS SCRIPT!
 
-// Configuração do CORS: Permite requisições do seu frontend.
-// EM PRODUÇÃO, MUDE '*' PARA O DOMÍNIO DO SEU FRONTEND (ex: 'https://seufrotend.onrender.com')
-app.use(cors());
+// ===> URL DO SEU FRONTEND HOSPEDADO NO VERCEL <===
+// Você forneceu esta URL!
+const FRONTEND_URL = "https://presencas-bras.vercel.app";
+
+// Configuração do CORS: Permite requisições APENAS do seu frontend Vercel
+app.use(cors({
+    origin: FRONTEND_URL
+}));
 app.use(express.json());
 
-// Função utilitária para fazer requisições GET ao Apps Script (SEM ALTERAÇÕES AQUI)
+// Função utilitária para fazer requisições GET ao Apps Script
 async function fetchFromAppsScript(endpointType) {
     const url = `${APPS_SCRIPT_URL}?tipo=${endpointType}`;
     console.log(`Backend: Encaminhando GET para Apps Script: ${url}`);
@@ -29,7 +34,7 @@ async function fetchFromAppsScript(endpointType) {
     return await response.json();
 }
 
-// ROTAS GET PARA O FRONTEND (SEM ALTERAÇÕES AQUI)
+// ROTAS GET PARA O FRONTEND
 app.get("/get-membros", async (req, res) => {
     try {
         const data = await fetchFromAppsScript('getMembros');
@@ -60,7 +65,7 @@ app.get("/get-presencas-total", async (req, res) => {
     }
 });
 
-// ROTA POST PARA REGISTRAR PRESENÇA (ALTERAÇÃO AQUI PARA TRATAR RESPOSTA "OK" OU JSON DE ERRO)
+// ROTA POST PARA REGISTRAR PRESENÇA
 app.post("/presenca", async (req, res) => {
   try {
     console.log("Recebido do frontend (POST /presenca):", req.body);
@@ -74,31 +79,25 @@ app.post("/presenca", async (req, res) => {
       }
     );
 
-    const text = await response.text(); // Sempre leia como texto primeiro
+    const text = await response.text(); 
 
     let responseData;
-    // Tenta parsear como JSON. Se falhar, assume que é texto puro (como "OK").
     try {
         responseData = JSON.parse(text);
     } catch (parseError) {
-        // Se não for JSON, então é uma string simples (como "OK").
-        // Cria um objeto para padronizar o retorno.
-        responseData = { message: text };
+        responseData = { message: text }; // Assume que é uma string simples como "OK"
     }
 
-    // Verifica se a resposta não foi OK ou se o JSON de resposta indica erro
-    // O seu Apps Script retorna 'OK' para sucesso ou JSON com '{error: true, message: 'Erro: ...'}'
     if (!response.ok || (responseData.error && responseData.message?.startsWith('Erro:'))) {
         console.error("Erro do Apps Script (POST):", response.status, responseData);
         return res.status(response.status >= 400 ? response.status : 500).json({
             error: "Erro do Apps Script ao registrar presença",
-            details: responseData.message || responseData // Usa a mensagem de erro do Apps Script
+            details: responseData.message || responseData
         });
     }
 
-    // Se chegou aqui, a resposta foi bem-sucedida (ex: 'OK')
     console.log("Resposta do Apps Script (POST):", responseData);
-    res.status(200).json({ message: "Presença registrada com sucesso!" }); // Retorna um JSON padrão de sucesso
+    res.status(200).json({ message: "Presença registrada com sucesso!" }); 
   } catch (err) {
     console.error("Erro ao enviar para o Apps Script (POST):", err);
     res.status(500).json({ error: "Erro interno do servidor", details: err.message });
