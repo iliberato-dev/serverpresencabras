@@ -2,11 +2,11 @@
   "name": "presencas-backend",
   "version": "1.0.0",
   "description": "Servidor proxy para o Google Apps Script",
-  "main": "index.js",  <-- MUDAR AQUI: de "server.js" para "index.js"
+  "main": "index.js",  
   "type": "module",
   "scripts": {
-    "start": "node index.js",  <-- MUDAR AQUI: de "server.js" para "index.js"
-    "dev": "node --watch index.js"  <-- MUDAR AQUI: de "server.js" para "index.js"
+    "start": "node index.js",  
+    "dev": "node --watch index.js" 
   },
   "dependencies": {
     "cors": "^2.8.5",
