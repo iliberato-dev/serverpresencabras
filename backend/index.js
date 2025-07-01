@@ -16,7 +16,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTmDpB4RGxJ6wh
 // Você forneceu esta URL!
 const FRONTEND_URL = "https://presencas-bras.vercel.app";
 const FRONTEND_LOCAL_URL = "http://127.0.0.1:5500/index.html"; // ou a porta que você usa, como 3000, 8080 etc.
-// Configuração do CORS: Permite requisições APENAS do seu frontend Vercel
+// Configuração do CORS: Permite requisições APENAS do seu frontend Vercel e local
 app.use(cors({
     origin: [FRONTEND_URL, FRONTEND_LOCAL_URL]
 }));
